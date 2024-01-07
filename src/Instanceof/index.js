@@ -14,6 +14,11 @@ function myInstanceof(left, right) {
 }
 
 function Person() {}
+class Student { 
+
+}
 var p = new Person();
+var s = new Student();
 console.log(myInstanceof(p, Object));
-// console.log(p instanceof Person);//true
+console.log(myInstanceof(s, Student));
+console.log(myInstanceof(s, Person));
