@@ -1,6 +1,6 @@
 /**
  * @基本思路
- * - 根据 Object.getPrototypeOf 可以拿到对象的原型，根据 Object.prototype 可以拿到构造函数的原型（function Perrson(){} 使一个构造函数）
+ * - 根据 Object.getPrototypeOf 可以拿到对象的原型，根据 Object.prototype 可以拿到构造函数/类的原型（例如function Perrson(){} 是一个构造函数）
  * - 不断通过 Object.getPrototypeOf 从 left 的原型链向上查找，如果找到 right(构造函数) 的原型，则返回true
  */
 function myInstanceof(left, right) {
