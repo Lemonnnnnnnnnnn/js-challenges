@@ -6,7 +6,6 @@ const data = {
     classroom: "教室2"
 }
 
-
 console.log(
     render("{{ name }} 今年 {{ age }} 岁，就读于 {{ school }} 今天在 {{ classroom }} 上课，{{ name }} {{ #data.age >= 18 ? '成年了' : '未成年' }}", data)
 );
@@ -21,3 +20,4 @@ console.log(
         }
     }}`, data)
 );
+// 小明说了句我还没有成年！
