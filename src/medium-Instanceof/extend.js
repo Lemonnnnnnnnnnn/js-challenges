@@ -10,6 +10,7 @@ function Son(name, age) {
 }
 
 // 将Son的原型类型设置为 Parent 的原型类型
+// 在计算机学中，反射式编程或反射(Reflect)，是指计算机程序在运行时可以访问、检测和修改它本身状态或行为的一种能力。用比喻来说，反射就是程序在运行的时候能够“观察”并且修改自己的行为。 要注意术语“反射”和“内省”的关系。
 Reflect.setPrototypeOf(Son.prototype, Parent.prototype);
 // Object.setPrototypeOf(Son.prototype , Parent.prototype)
 
