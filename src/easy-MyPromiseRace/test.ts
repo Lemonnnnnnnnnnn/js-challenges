@@ -1,8 +1,9 @@
 import { MyPromiseRace } from ".";
+import { MyPromise } from "../hard-MyPromise";
 
 
 function p1() {
-    return new Promise((resolve, reject) => {
+    return new MyPromise((resolve, reject) => {
         setTimeout(() => {
             resolve('p1')
         }, 1000)
@@ -10,14 +11,14 @@ function p1() {
 }
 
 function p2() {
-    return new Promise((resolve, reject) => {
+    return new MyPromise((resolve, reject) => {
         setTimeout(() => {
             resolve('p2')
         }, 2000)
     })
 }
 function p3() {
-    return new Promise((resolve, reject) => {
+    return new MyPromise((resolve, reject) => {
         setTimeout(() => {
             resolve('p3')
         }, 3000)
@@ -25,7 +26,7 @@ function p3() {
 }
 
 function e1() {
-    return new Promise((resolve, reject) => {
+    return new MyPromise((resolve, reject) => {
         setTimeout(() => {
             reject('e1')
         }, 500)
