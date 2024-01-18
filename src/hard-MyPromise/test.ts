@@ -1,7 +1,7 @@
 import { MyPromise } from ".";
 
 function testCase() {
-  return new MyPromise((resolve, reject) => {
+  return new MyPromise<number>((resolve, reject) => {
     setTimeout(() => {
       resolve(1);
     }, 2000);
