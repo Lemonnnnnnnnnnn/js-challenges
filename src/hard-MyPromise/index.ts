@@ -7,15 +7,18 @@ type onRejected = (value: any) => any;
 type Status = "pending" | "fulfilled" | "rejected";
 
 export class MyPromise<T> {
-  // 将下一层 resolve 存储起来，这样就可以将 onfulfilled 的结果传给下一层 nextResolve 了
-  onfulfilled:
+  // 将下一层 resolve/reject 存储起来，这样就可以将前一层的结果传给下一层了
+  callback:
     | {
-        method: onFulfilled<T>;
+        onfulfilled?: onFulfilled<T>;
+        onrejected?: onRejected;
         nextResolve: (value: T) => void;
+        nextReject: (reason?: any) => void;
       }
     | undefined;
-  onrejected: onRejected | undefined;
+
   status: Status;
+  data: any;
 
   constructor(executor: Executor<T>) {
     this.status = "pending";
@@ -32,33 +35,57 @@ export class MyPromise<T> {
 
   _resolve = (data: T) => {
     if (this.status !== "pending") return;
-    this.status = "fulfilled"
-    if (this.onfulfilled) {
-      const res = this.onfulfilled.method(data);
-      this.onfulfilled.nextResolve(res);
-    }
+    this.status = "fulfilled";
+    this.data = data;
+
+    this.handle();
   };
 
   _reject = (error: any) => {
     if (this.status !== "pending") return;
-    this.status = "rejected"
+    this.status = "rejected";
+    this.data = error;
 
-    if (this.onrejected) {
-      this.onrejected(error);
-    }
+    this.handle();
   };
 
-  then = (onfulfilled: onFulfilled<T>) => {
+  handle = () => {
+    if (this.status === "pending") {
+      return;
+    }
+
+    const cb =
+      this.status === "fulfilled"
+        ? this.callback?.onfulfilled
+        : this.callback?.onrejected;
+
+    const next =
+      this.status === "fulfilled"
+        ? this.callback?.nextResolve
+        : this.callback?.nextReject;
+
+    if (!cb) {
+      next?.(this.data);
+      return;
+    }
+
+    const res = cb?.(this.data);
+    next?.(res);
+  };
+
+  then = (onfulfilled?: onFulfilled<T>, onrejected?: onRejected) => {
     return new Promise((resolve, reject) => {
-      this.onfulfilled = {
-        method: onfulfilled,
+      this.callback = {
+        onfulfilled,
+        onrejected,
+        nextReject: reject,
         nextResolve: resolve,
       };
     });
   };
 
   catch = (onrejected: onRejected) => {
-    this.onrejected = onrejected;
+    return this.then(undefined, onrejected);
   };
 
   finally = () => {};
