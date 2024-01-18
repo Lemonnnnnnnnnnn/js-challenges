@@ -1,4 +1,4 @@
-import { MyPromise } from ".";
+import { MyPromise } from "..";
 
 function sleep(time: number) {
   return new MyPromise((resolve, reject) => {
