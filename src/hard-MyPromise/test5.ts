@@ -8,20 +8,21 @@ function testCase() {
   });
 }
 
-function test() {
-  testCase()
-    .then((res) => {
-      console.log("1", res);
-      return (res as number) + 1;
-    })
-    .then((res) => {
-      return new MyPromise((resolve, reject) => {
-        resolve((res as number) + 1);
-      });
-    })
-    .then((res) => {
-      console.log("3", res);
+testCase()
+  .then((res) => {
+    console.log(res);
+    return new MyPromise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(res + 1);
+      }, 1000);
     });
-}
-
-test();
+  })
+  .then((res) => {
+    console.log(res);
+    return new MyPromise((resolve, reject) => {
+      resolve(res + 1);
+    });
+  })
+  .then((res) => {
+    console.log(res);
+  });

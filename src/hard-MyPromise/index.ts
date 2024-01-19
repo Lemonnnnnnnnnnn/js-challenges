@@ -1,18 +1,18 @@
-type Executor<T> = (
-  resolve: (value: T) => void,
+type Executor = (
+  resolve: (value?: any) => void,
   reject: (reason?: any) => void
 ) => void;
-type onFulfilled<T> = (value: T) => any;
+type onFulfilled = (value: any) => any;
 type onRejected = (value: any) => any;
 type Status = "pending" | "fulfilled" | "rejected";
 
-export class MyPromise<T> {
-  // 将下一层 resolve/reject 存储起来，这样就可以将前一层的结果传给下一层了
+export class MyPromise {
+  // 将下一层 resolve/reject 存储起来，用以将前一层的结果传给下一层了
   callback:
     | {
-        onfulfilled?: onFulfilled<T>;
+        onfulfilled?: onFulfilled;
         onrejected?: onRejected;
-        nextResolve: (value: T) => void;
+        nextResolve: (value?: any) => void;
         nextReject: (reason?: any) => void;
       }
     | undefined;
@@ -20,61 +20,13 @@ export class MyPromise<T> {
   status: Status;
   data: any;
 
-  constructor(executor: Executor<T>) {
+  constructor(executor: Executor) {
     this.status = "pending";
     executor(this._resolve, this._reject);
   }
 
-  static all() {}
-
-  static race() {}
-
-  static resolve() {}
-
-  static reject() {}
-
-  _resolve = (data: T) => {
-    if (this.status !== "pending") return;
-    this.status = "fulfilled";
-    this.data = data;
-
-    this.handle();
-  };
-
-  _reject = (error: any) => {
-    if (this.status !== "pending") return;
-    this.status = "rejected";
-    this.data = error;
-
-    this.handle();
-  };
-
-  handle = () => {
-    if (this.status === "pending") {
-      return;
-    }
-
-    const cb =
-      this.status === "fulfilled"
-        ? this.callback?.onfulfilled
-        : this.callback?.onrejected;
-
-    const next =
-      this.status === "fulfilled"
-        ? this.callback?.nextResolve
-        : this.callback?.nextReject;
-
-    if (!cb) {
-      next?.(this.data);
-      return;
-    }
-
-    const res = cb?.(this.data);
-    next?.(res);
-  };
-
-  then = (onfulfilled?: onFulfilled<T>, onrejected?: onRejected) => {
-    return new Promise((resolve, reject) => {
+  then = (onfulfilled?: onFulfilled, onrejected?: onRejected) => {
+    return new MyPromise((resolve, reject) => {
       this.callback = {
         onfulfilled,
         onrejected,
@@ -89,4 +41,71 @@ export class MyPromise<T> {
   };
 
   finally = () => {};
+
+  _resolve = (data: any) => {
+    if (this.status !== "pending") return;
+
+    if (typeof data === "object" && typeof data?.then === "function") {
+      data.then(this._resolve, this._reject);
+      return;
+    }
+
+    this.status = "fulfilled";
+    this.handle(data);
+  };
+
+  _reject = (error: any) => {
+    if (this.status !== "pending") return;
+
+    if (typeof error === "object" && typeof error?.then === "function") {
+      error.then(this._resolve, this._reject);
+      return;
+    }
+
+    this.status = "rejected";
+
+    this.handle(error);
+  };
+
+  handle = (data: any) => {
+    const fn = () => {
+      if (this.status === "pending") {
+        return;
+      }
+
+      const cb =
+        this.status === "fulfilled"
+          ? this.callback?.onfulfilled
+          : this.callback?.onrejected;
+
+      const next =
+        this.status === "fulfilled"
+          ? this.callback?.nextResolve
+          : this.callback?.nextReject;
+
+      if (!cb) {
+        next?.(data);
+        return;
+      }
+
+      const res = cb?.(data);
+
+      next?.(res);
+    };
+
+    // 将无延迟的 Promise 放到下一个宏任务处理，这是为了让所有的 Promise 实例执行完 contruction 再调用 resolve 
+    setTimeout(fn, 0);
+  };
+
+  static all() {}
+
+  static race() {}
+
+  static resolve(data: any) {
+    return new MyPromise((resolve, reject) => {
+      resolve(data);
+    });
+  }
+
+  static reject() {}
 }
