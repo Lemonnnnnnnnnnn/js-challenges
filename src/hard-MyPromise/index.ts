@@ -8,7 +8,7 @@ type Status = "pending" | "fulfilled" | "rejected";
 
 export class MyPromise {
   // 将下一层 resolve/reject 存储起来，用以将前一层的结果传给下一层了
-  callback:
+  private callback:
     | {
         onfulfilled?: onFulfilled;
         onrejected?: onRejected;
@@ -17,14 +17,14 @@ export class MyPromise {
       }
     | undefined;
 
-  status: Status;
-  data: any;
+  private status: Status;
 
   constructor(executor: Executor) {
     this.status = "pending";
     executor(this._resolve, this._reject);
   }
 
+  // 注册回调事件
   then = (onfulfilled?: onFulfilled, onrejected?: onRejected) => {
     return new MyPromise((resolve, reject) => {
       this.callback = {
@@ -36,11 +36,15 @@ export class MyPromise {
     });
   };
 
+  // 注册回调事件
   catch = (onrejected: onRejected) => {
     return this.then(undefined, onrejected);
   };
 
-  finally = () => {};
+  // 注册回调事件
+  finally = (onDone: () => void) => {
+    this.then(onDone, onDone);
+  };
 
   private _resolve = (data: any) => {
     if (this.status !== "pending") return;
@@ -97,7 +101,7 @@ export class MyPromise {
       }
     };
 
-    // 将无延迟的 Promise 放到下一个宏任务处理，这是为了让所有的 Promise 实例执行完 contruction 再调用 resolve
+    // 将无延迟的 Promise 放到下一个宏任务处理，这是为了让所有的 Promise 实例执行完 contruction 再调用 resolve/reject
     setTimeout(fn, 0);
   };
 
