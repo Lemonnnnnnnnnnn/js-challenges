@@ -88,12 +88,15 @@ export class MyPromise {
         return;
       }
 
-      const res = cb?.(data);
-
-      next?.(res);
+      try {
+        const res = cb?.(data);
+        next?.(res);
+      } catch (e) {
+        this.callback?.nextReject(e);
+      }
     };
 
-    // 将无延迟的 Promise 放到下一个宏任务处理，这是为了让所有的 Promise 实例执行完 contruction 再调用 resolve 
+    // 将无延迟的 Promise 放到下一个宏任务处理，这是为了让所有的 Promise 实例执行完 contruction 再调用 resolve
     setTimeout(fn, 0);
   };
 
@@ -107,5 +110,9 @@ export class MyPromise {
     });
   }
 
-  static reject() {}
+  static reject(data: any) {
+    return new MyPromise((resolve, reject) => {
+      reject(data);
+    });
+  }
 }
