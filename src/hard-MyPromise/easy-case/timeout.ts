@@ -1,8 +1,7 @@
-import { MyPromiseRace } from ".";
-import { MyPromise } from "../hard-MyPromise";
+import { MyPromise } from "..";
 
-export function timeout(promise: MyPromise<any>) {
-  MyPromiseRace([
+export function timeout(promise: MyPromise) {
+  MyPromise.race([
     promise,
     new MyPromise((resolve, reject) => {
       setTimeout(() => {

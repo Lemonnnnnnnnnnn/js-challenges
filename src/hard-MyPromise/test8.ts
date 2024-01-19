@@ -1,5 +1,4 @@
-import { MyPromise } from '..'
-import { MyPromiseAll } from './index'
+import { MyPromise } from '.'
 
 function p1() {
     return new MyPromise((resolve, reject) => {
@@ -32,11 +31,12 @@ function e1() {
     })
 }
 
-MyPromiseAll([p1(), p2(), p3()]).then(res => {
-    console.log(res);
+
+MyPromise.all([p1(), p2(), p3()]).then(res => {
+  console.log(res);
 })
 
-MyPromiseAll([p1(), p2(), p3(), e1()]).then(res => {
+MyPromise.all([p1(), p2(), p3(), e1()]).then(res => {
     console.log(res);
 }).catch(e => {
     console.log(e);

@@ -42,7 +42,7 @@ export class MyPromise {
 
   finally = () => {};
 
-  _resolve = (data: any) => {
+  private _resolve = (data: any) => {
     if (this.status !== "pending") return;
 
     if (typeof data === "object" && typeof data?.then === "function") {
@@ -54,7 +54,7 @@ export class MyPromise {
     this.handle(data);
   };
 
-  _reject = (error: any) => {
+  private _reject = (error: any) => {
     if (this.status !== "pending") return;
 
     if (typeof error === "object" && typeof error?.then === "function") {
@@ -67,7 +67,8 @@ export class MyPromise {
     this.handle(error);
   };
 
-  handle = (data: any) => {
+  // 执行回调函数并传递结果给下层Promise
+  private handle = (data: any) => {
     const fn = () => {
       if (this.status === "pending") {
         return;
@@ -100,9 +101,42 @@ export class MyPromise {
     setTimeout(fn, 0);
   };
 
-  static all() {}
+  static all<T>(promiseArr: MyPromise[]) {
+    return new MyPromise((resolve, reject) => {
+      const resolveRes: T[] = [];
+      for (let promise of promiseArr) {
+        promise
+          .then((res) => {
+            resolveRes.push(res);
+            if (resolveRes.length === promiseArr.length) {
+              resolve(resolveRes);
+            }
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      }
+    });
+  }
 
-  static race() {}
+  static race(promises: MyPromise[]) {
+    return new MyPromise((resolve, reject) => {
+      let hasValue = false;
+      for (let promise of promises) {
+        promise
+          .then((res) => {
+            if (hasValue) return;
+            hasValue = true;
+            resolve(res);
+          })
+          .catch((e) => {
+            if (hasValue) return;
+            hasValue = true;
+            reject(e);
+          });
+      }
+    });
+  }
 
   static resolve(data: any) {
     return new MyPromise((resolve, reject) => {

@@ -1,6 +1,4 @@
-import { MyPromiseRace } from ".";
-import { MyPromise } from "../hard-MyPromise";
-
+import { MyPromise } from "."
 
 function p1() {
     return new MyPromise((resolve, reject) => {
@@ -33,12 +31,12 @@ function e1() {
     })
 }
 
-MyPromiseRace([p1(), p2(), p3()]).then(res => {
+MyPromise.race([p1(), p2(), p3()]).then(res => {
     console.log(res);
 })
 
 
-MyPromiseRace([p1(), p2(), p3(), e1()]).then(res => {
+MyPromise.race([p1(), p2(), p3(), e1()]).then(res => {
     console.log(res);
 }).catch(e => {
     console.log(e);
