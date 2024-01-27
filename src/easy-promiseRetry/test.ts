@@ -10,7 +10,7 @@ function test() {
 
     };
 
-    PromiseRetry(fetchData, 3)
+    PromiseRetry(fetchData, 3, 1000)
         .then((data) => {
             // 成功获取数据
             console.log({ data });

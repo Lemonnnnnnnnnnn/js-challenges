@@ -1,5 +1,5 @@
 
-export async function PromiseRetry<T>(fn: () => Promise<T>, retryTime: number, defaultValue?: any) {
+export async function PromiseRetry<T>(fn: () => Promise<T>, retryTime: number, delay: number, defaultValue?: any) {
     return new Promise((resolve, reject) => {
         fn().then(res => {
             resolve(res)
@@ -11,11 +11,15 @@ export async function PromiseRetry<T>(fn: () => Promise<T>, retryTime: number, d
                     reject(e)
                 }
             } else {
-                PromiseRetry(fn, retryTime - 1, defaultValue).then(res => {
-                    resolve(res)
-                }).catch(e => {
-                    reject(e)
-                })
+                setTimeout(() => {
+                    console.log('retry...');
+                    
+                    PromiseRetry(fn, retryTime - 1, defaultValue).then(res => {
+                        resolve(res)
+                    }).catch(e => {
+                        reject(e)
+                    })
+                }, delay)
             }
         })
     })
