@@ -1,3 +1,5 @@
+// 实际上是 Promise 的链式调用问题
+
 export class Queue {
     tasks: (() => PromiseLike<any>)[]
 
