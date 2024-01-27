@@ -1,5 +1,6 @@
 // ref:https://github.com/Sunny-117/js-challenges/issues/151
 
+// Promise.race 解法
 export async function asyncPool(limit: number, dataSource: any[], iteratorFn: (data: any) => any) {
     const ret: any[] = []  // Promise任务
     const pool: any[] = []  // 并发队列

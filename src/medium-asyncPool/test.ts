@@ -1,4 +1,4 @@
-import { asyncPool } from "."
+import { asyncPool } from "./index2"
 
 const dataSouce = [1, 2, 3]
 function iteratorFn(time: any) {
