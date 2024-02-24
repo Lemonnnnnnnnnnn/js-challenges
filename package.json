@@ -12,7 +12,7 @@
     "cli": "node ./lib/node/app.mjs",
     "build": "rollup -c rollup.config.js",
     "gen-manifest": "node ./lib/scripts/gen-manifest.mjs",
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "keywords": [],
   "author": "",

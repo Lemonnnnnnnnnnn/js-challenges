@@ -1,14 +1,16 @@
-let timer: number | null
+let timer: number | null | NodeJS.Timeout;
 
-export function debounce(fn: Function, time: number) {
-    return function (...params: any[]) {
-        if (timer) {
-            clearTimeout(timer)
-            timer = null
-        }
+export function debounce<T extends (...p: any[]) => any>(fn: T, time: number) {
+  return function (...params: any[]) {
+    return new Promise<ReturnType<T>>((resolve) => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
 
-        timer = setTimeout(() => {
-            fn(...params)
-        }, time)
-    }
+      timer = setTimeout(() => {
+        resolve(fn(...params));
+      }, time);
+    });
+  };
 }
