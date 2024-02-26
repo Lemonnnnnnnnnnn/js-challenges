@@ -1,9 +1,6 @@
 // ref: https://stackoverflow.com/questions/38740610/object-getprototypeof-vs-prototype
-import { test, expect } from "@jest/globals";
-
 
 function MyConstructor() { }
-// @ts-expect-error
 let a = new MyConstructor();
 
 test("prototype", () => {
@@ -27,7 +24,6 @@ function MyConstructor2() { }
 MyConstructor2.prototype.func = function () {
     return "func"
 };
-// @ts-expect-error
 let b = new MyConstructor2();
 
 test("prototype function", () => {
